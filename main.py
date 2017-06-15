@@ -1,5 +1,6 @@
 import requests
 from PIL import Image
+from resizeimage import resizeimage
 from io import BytesIO
 import math
 
@@ -14,17 +15,17 @@ if deck_request.status_code == 200:
     proxy_list = []
     for card_id, number in deck_data['data'][0]['cards'].items():
         card_picture = requests.get("http://netrunnerdb.com/card_image/" + card_id + ".png")
-        resized_card_picture = Image.open(BytesIO(card_picture.content))
-        resized_card_picture = resized_card_picture.resize((resize_width, resize_height), Image.ANTIALIAS)
+        resized_card_picture = Image.open(BytesIO(card_picture.content)).convert("RGBA")
+        resized_card_picture = resized_card_picture.resize((resize_width, resize_height), Image.LANCZOS)
         for cards in range (0, number):
             proxy_list.append(resized_card_picture)
 
     proxy_index = 0
 
     for sheet_count in range (0, math.ceil(len(proxy_list)/9)): # how many pages do we need?
-        sheet = Image.new('RGB', (resize_width *3, resize_height * 3)) # a sheet is 3 rows of 3 cards
+        sheet = Image.new('RGBA', (resize_width *3, resize_height * 3)) # a sheet is 3 rows of 3 cards
         y_offset = 0
-        rows = [Image.new('RGB', (resize_width * 3, resize_height))] * 3
+        rows = [Image.new('RGBA', (resize_width * 3, resize_height))] * 3
         for row in rows:
             x_offset = 0
 
