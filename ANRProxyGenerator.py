@@ -9,7 +9,7 @@ base_url = "https://netrunnerdb.com/api/2.0/public/deck/"
 resize_height = 325
 resize_width = 225
 
-usage = 'main.py -d <deck id>'
+usage = 'ANRProxyGenerator.py -d <deck id>'
 
 
 def main(argv):
