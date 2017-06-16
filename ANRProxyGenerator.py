@@ -8,7 +8,6 @@ import getopt
 base_url = "https://netrunnerdb.com/api/2.0/public/deck/"
 resize_height = 325
 resize_width = 225
-
 usage = 'ANRProxyGenerator.py -d <deck id>'
 
 
@@ -18,7 +17,6 @@ def main(argv):
         opts, args = getopt.getopt(argv, 'd:', ["deckid="]) #Get the deck id from the command line
 
         for opt, arg in opts:
-            print(opt)
             if opt in ("-d", "--deckid"):
                 deck_id = arg
             else:
@@ -27,20 +25,23 @@ def main(argv):
         deck_request = requests.get(base_url + str(deck_id))
         if deck_request.status_code == 200:
             deck_data = deck_request.json()
-
             proxy_list = []
+
             for card_id, number in deck_data['data'][0]['cards'].items():
                 card_picture = requests.get("http://netrunnerdb.com/card_image/" + card_id + ".png")
                 resized_card_picture = Image.open(BytesIO(card_picture.content)).convert("RGBA")
                 resized_card_picture = resized_card_picture.resize((resize_width, resize_height), Image.LANCZOS)
+
+                # Create a list of all pictures to be printed (including duplicates)
                 for cards in range (0, number):
                     proxy_list.append(resized_card_picture)
 
             proxy_index = 0
 
-            for sheet_count in range (0, math.ceil(len(proxy_list)/9)): # how many pages do we need?
-                sheet = Image.new('RGBA', (resize_width *3, resize_height * 3)) # a sheet is 3 rows of 3 cards
+            for sheet_count in range (0, math.ceil(len(proxy_list)/9)): #how many pages do we need?
+                sheet = Image.new('RGBA', (resize_width *3, resize_height * 3)) #a sheet is 3 rows of 3 cards
                 y_offset = 0
+                # Fill three rows of three images
                 rows = [Image.new('RGBA', (resize_width * 3, resize_height))] * 3
                 for row in rows:
                     x_offset = 0
@@ -51,6 +52,7 @@ def main(argv):
                         row.paste(proxy_list[j], (x_offset,0))
                         x_offset += resize_width
 
+                    # Combine rows vertically into one image
                     sheet.paste(row, (0, y_offset))
                     y_offset += resize_height
                     proxy_index += 3
@@ -62,7 +64,7 @@ def main(argv):
             print("Error: Could not retrieve decklist")
 
     except getopt.GetoptError as e:
-        print(str(e))
+        print("Error: " + str(e))
         print(usage)
         sys.exit(2)
 
