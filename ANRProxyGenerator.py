@@ -6,8 +6,8 @@ import sys
 import getopt
 
 base_url = "https://netrunnerdb.com/api/2.0/public/deck/"
-resize_height = 325
-resize_width = 225
+resize_height = 346
+resize_width = 243
 usage = 'ANRProxyGenerator.py -d <deck id>'
 
 
@@ -59,7 +59,7 @@ def main(argv):
                     if proxy_index >= len(proxy_list):
                         break
 
-                sheet.save('img_' + str(sheet_count)+ '.png', 'PNG', quality=90)
+                sheet.save(str(deck_id) + "_" + str(sheet_count)+ '.png', 'PNG', quality=90)
         else:
             print("Error: Could not retrieve decklist")
 
